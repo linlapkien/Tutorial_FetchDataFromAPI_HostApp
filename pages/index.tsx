@@ -1,9 +1,14 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import style from '@/styles/FlexBox.module.css';
 
 const CocktailContainer = dynamic(() => import('component_app/CocktailCard'), {
+  loading: () => <p>Loading...</p>,
+  ssr: false,
+});
+
+const SetQuantity = dynamic(() => import('component_app/SetQuantity'), {
   loading: () => <p>Loading...</p>,
   ssr: false,
 });
@@ -31,9 +36,11 @@ async function fetchdetails() {
 export default function Home() {
   const [data, setData] = useState<Props[]>([]);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(0);
 
   const datas = fetchdetails();
 
+  //---------------------------------------
   useEffect(() => {
     datas
       .then((result) => {
@@ -54,6 +61,17 @@ export default function Home() {
     console.log(res.drinks);
   });
 
+  //---------------------------------------
+  const handleQtyIncrease = () => {
+    setQuantity(quantity + 1);
+  };
+
+  //---------------------------------------
+  const handleQtyDecrease = () => {
+    setQuantity(quantity - 1);
+  };
+
+  //---------------------------------------
   return (
     <div>
       Bartender Shoppppp
@@ -65,6 +83,11 @@ export default function Home() {
               strDrink={item.strDrink}
               strDrinkThumb={item.strDrinkThumb}
               idDrink={item.idDrink}
+            />
+            <SetQuantity
+              quantity={quantity}
+              handleQtyIncrease={handleQtyIncrease}
+              handleQtyDecrease={handleQtyDecrease}
             />
           </div>
         ))}
